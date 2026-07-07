@@ -1,0 +1,87 @@
+<Window x:Class="OpenLegacyPlayer.Views.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        WindowStyle="None" ResizeMode="NoResize" AllowsTransparency="True"
+        Background="Transparent" SizeToContent="Height" Width="440"
+        WindowStartupLocation="CenterOwner" ShowInTaskbar="False"
+        FontFamily="Segoe UI" FontSize="12">
+
+    <Window.Resources>
+        <Style x:Key="SectionHeader" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Foreground" Value="{StaticResource HeaderTextBrush}" />
+            <Setter Property="Margin" Value="0,14,0,6" />
+        </Style>
+        <Style x:Key="ComingSoon" TargetType="CheckBox">
+            <Setter Property="IsEnabled" Value="False" />
+            <Setter Property="Margin" Value="2,4" />
+            <Setter Property="Foreground" Value="{StaticResource SubtleTextBrush}" />
+        </Style>
+        <Style x:Key="GlassAction" TargetType="Button">
+            <Setter Property="Padding" Value="12,4" />
+            <Setter Property="Background" Value="{StaticResource GlassButtonBrush}" />
+            <Setter Property="BorderBrush" Value="{StaticResource GlassButtonBorderBrush}" />
+            <Setter Property="Foreground" Value="{StaticResource HeaderTextBrush}" />
+            <Setter Property="Cursor" Value="Hand" />
+        </Style>
+    </Window.Resources>
+
+    <Border Background="{StaticResource WindowChromeBrush}" CornerRadius="6"
+            BorderBrush="{StaticResource ChromeBorderBrush}" BorderThickness="1">
+        <Border.Effect>
+            <DropShadowEffect Color="#66000000" BlurRadius="14" ShadowDepth="3" Opacity="0.5" />
+        </Border.Effect>
+        <StackPanel>
+            <!-- Title bar -->
+            <Border Background="{StaticResource TitleBarBrush}" CornerRadius="6,6,0,0"
+                    BorderBrush="{StaticResource AccentLineBrush}" BorderThickness="0,0,0,1"
+                    MouseLeftButtonDown="TitleBar_MouseDown">
+                <Grid>
+                    <TextBlock Text="Settings" Margin="14,8" FontSize="13"
+                               Foreground="{StaticResource HeaderTextBrush}" />
+                    <Button Content="&#xE8BB;" FontFamily="{StaticResource SymbolFont}" FontSize="9"
+                            HorizontalAlignment="Right" Width="34" Background="Transparent"
+                            BorderThickness="0" Foreground="#FF32506E" Cursor="Hand"
+                            Click="Close_Click" />
+                </Grid>
+            </Border>
+
+            <StackPanel Margin="18,4,18,16">
+
+                <TextBlock Text="Playback" Style="{StaticResource SectionHeader}" />
+                <CheckBox Style="{StaticResource ComingSoon}" Content="Resume where I left off when the app starts  (coming soon)" />
+                <CheckBox Style="{StaticResource ComingSoon}" Content="Crossfade between tracks  (coming soon)" />
+
+                <TextBlock Text="Appearance" Style="{StaticResource SectionHeader}" />
+                <CheckBox Style="{StaticResource ComingSoon}" Content="Color themes — Energy Blue, Emerald, Violet  (coming soon)" />
+                <CheckBox Style="{StaticResource ComingSoon}" Content="Mini player mode  (coming soon)" />
+
+                <TextBlock Text="Updates" Style="{StaticResource SectionHeader}" />
+                <CheckBox x:Name="AutoUpdateCheck" Margin="2,4"
+                          Content="Check for updates when the app starts"
+                          Foreground="{StaticResource BodyTextBrush}" />
+
+                <TextBlock Text="Library" Style="{StaticResource SectionHeader}" />
+                <StackPanel Orientation="Horizontal" Margin="2,2">
+                    <Button Style="{StaticResource GlassAction}" Content="Open library folder"
+                            Click="OpenDataFolder_Click" Margin="0,0,8,0" />
+                    <Button Style="{StaticResource GlassAction}" Content="Open playlists folder"
+                            Click="OpenPlaylistsFolder_Click" />
+                </StackPanel>
+                <TextBlock Margin="2,6,0,0" FontSize="11" Foreground="{StaticResource SubtleTextBrush}"
+                           Text="Your library index, playlists and settings live in %AppData%\OpenLegacyPlayer." />
+
+                <Border Height="1" Background="{StaticResource HairlineBrush}" Margin="0,14,0,10" />
+
+                <Grid>
+                    <TextBlock x:Name="VersionText" VerticalAlignment="Center" FontSize="11"
+                               Margin="0,0,86,0" TextTrimming="CharacterEllipsis"
+                               Foreground="{StaticResource SubtleTextBrush}" />
+                    <Button Style="{StaticResource GlassAction}" Content="Close" HorizontalAlignment="Right"
+                            Padding="20,5" IsDefault="True" IsCancel="True" Click="Close_Click" />
+                </Grid>
+            </StackPanel>
+        </StackPanel>
+    </Border>
+</Window>

@@ -1,0 +1,62 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Read version from tag
+        id: version
+        shell: pwsh
+        run: |
+          $v = "${{ github.ref_name }}".TrimStart("v")
+          "value=$v" >> $env:GITHUB_OUTPUT
+
+      - name: Publish (self-contained, single file)
+        shell: pwsh
+        run: >
+          dotnet publish src/OpenLegacyPlayer -c Release -r win-x64
+          --self-contained true
+          -p:PublishSingleFile=true
+          -p:IncludeNativeLibrariesForSelfExtract=true
+          -p:Version=${{ steps.version.outputs.value }}
+
+      - name: Create portable zip
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force dist | Out-Null
+          Compress-Archive `
+            -Path "src/OpenLegacyPlayer/bin/Release/net10.0-windows/win-x64/publish/*" `
+            -DestinationPath "dist/OpenLegacyPlayer-Portable-${{ steps.version.outputs.value }}.zip"
+
+      - name: Build installer (Inno Setup)
+        shell: pwsh
+        run: |
+          choco install innosetup --no-progress -y
+          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" `
+            /DMyAppVersion=${{ steps.version.outputs.value }} `
+            installer\OpenLegacyPlayer.iss
+
+      - name: Attach artifacts to release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/OpenLegacyPlayer-Portable-${{ steps.version.outputs.value }}.zip
+            dist/OpenLegacyPlayer-Setup-${{ steps.version.outputs.value }}.exe
+          generate_release_notes: true

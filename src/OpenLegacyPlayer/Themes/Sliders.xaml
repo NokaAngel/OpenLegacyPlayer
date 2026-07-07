@@ -1,0 +1,208 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- ============================================================= -->
+    <!--  Shared Frutiger Aero slider pieces                            -->
+    <!-- ============================================================= -->
+
+    <!-- Inset watery groove: darker at the top so it reads as carved glass -->
+    <LinearGradientBrush x:Key="SliderGrooveBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#FFB7CDE1" Offset="0" />
+        <GradientStop Color="#FFD8E7F3" Offset="0.4" />
+        <GradientStop Color="#FFF2F8FC" Offset="0.85" />
+        <GradientStop Color="#FFFFFFFF" Offset="1" />
+    </LinearGradientBrush>
+
+    <SolidColorBrush x:Key="SliderGrooveBorderBrush" Color="#FF8FB0CD" />
+
+    <!-- Glossy liquid fill: bright shine on top, deep aqua below, inner glow -->
+    <LinearGradientBrush x:Key="SliderFillBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#FFE8F8FF" Offset="0" />
+        <GradientStop Color="#FF9AD6F7" Offset="0.3" />
+        <GradientStop Color="#FF44A2E4" Offset="0.5" />
+        <GradientStop Color="#FF1B72B4" Offset="0.92" />
+        <GradientStop Color="#FF2F8ACB" Offset="1" />
+    </LinearGradientBrush>
+
+    <SolidColorBrush x:Key="SliderFillBorderBrush" Color="#FF1A659E" />
+
+    <!-- Glass orb sphere body: off-centre origin sells the 3D ball -->
+    <RadialGradientBrush x:Key="SliderOrbBrush" GradientOrigin="0.32,0.26" Center="0.5,0.5"
+                         RadiusX="0.64" RadiusY="0.64">
+        <GradientStop Color="#FFF6FCFF" Offset="0" />
+        <GradientStop Color="#FFA6DAF7" Offset="0.35" />
+        <GradientStop Color="#FF44A2E4" Offset="0.72" />
+        <GradientStop Color="#FF135C97" Offset="1" />
+    </RadialGradientBrush>
+
+    <RadialGradientBrush x:Key="SliderOrbHoverBrush" GradientOrigin="0.32,0.26" Center="0.5,0.5"
+                         RadiusX="0.64" RadiusY="0.64">
+        <GradientStop Color="#FFFFFFFF" Offset="0" />
+        <GradientStop Color="#FFC2E9FC" Offset="0.35" />
+        <GradientStop Color="#FF5FB3EA" Offset="0.72" />
+        <GradientStop Color="#FF1A6CAC" Offset="1" />
+    </RadialGradientBrush>
+
+    <!-- Specular window on the upper-left of the orb -->
+    <LinearGradientBrush x:Key="SliderOrbGlossBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#F2FFFFFF" Offset="0" />
+        <GradientStop Color="#30FFFFFF" Offset="0.75" />
+        <GradientStop Color="#00FFFFFF" Offset="1" />
+    </LinearGradientBrush>
+
+    <SolidColorBrush x:Key="SliderOrbRimBrush" Color="#FF11517F" />
+
+    <!-- Glass orb thumb, 16px — used by the seek bar -->
+    <ControlTemplate x:Key="GlassOrbThumb" TargetType="Thumb">
+        <Grid Width="16" Height="16">
+            <!-- soft grounding shadow -->
+            <Ellipse Fill="#26062B45" Margin="0.5,2,-0.5,-1" />
+            <!-- rim -->
+            <Ellipse Fill="{StaticResource SliderOrbRimBrush}" />
+            <!-- sphere body -->
+            <Ellipse x:Name="body" Margin="1" Fill="{StaticResource SliderOrbBrush}" />
+            <!-- specular highlight -->
+            <Ellipse Margin="3.5,2.5,5.5,9" Fill="{StaticResource SliderOrbGlossBrush}" />
+            <!-- faint bottom bounce-light, like light passing through glass -->
+            <Ellipse Margin="4.5,10.5,4.5,2" Fill="#46C6ECFF" />
+        </Grid>
+        <ControlTemplate.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter TargetName="body" Property="Fill" Value="{StaticResource SliderOrbHoverBrush}" />
+            </Trigger>
+            <Trigger Property="IsDragging" Value="True">
+                <Setter TargetName="body" Property="Fill" Value="{StaticResource SliderOrbHoverBrush}" />
+            </Trigger>
+        </ControlTemplate.Triggers>
+    </ControlTemplate>
+
+    <!-- Glass orb thumb, 13px — used by the volume slider -->
+    <ControlTemplate x:Key="GlassOrbThumbSmall" TargetType="Thumb">
+        <Grid Width="13" Height="13">
+            <Ellipse Fill="#26062B45" Margin="0.5,1.6,-0.5,-0.8" />
+            <Ellipse Fill="{StaticResource SliderOrbRimBrush}" />
+            <Ellipse x:Name="body" Margin="1" Fill="{StaticResource SliderOrbBrush}" />
+            <Ellipse Margin="3,2,4.5,7.5" Fill="{StaticResource SliderOrbGlossBrush}" />
+        </Grid>
+        <ControlTemplate.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter TargetName="body" Property="Fill" Value="{StaticResource SliderOrbHoverBrush}" />
+            </Trigger>
+            <Trigger Property="IsDragging" Value="True">
+                <Setter TargetName="body" Property="Fill" Value="{StaticResource SliderOrbHoverBrush}" />
+            </Trigger>
+        </ControlTemplate.Triggers>
+    </ControlTemplate>
+
+    <!--
+        Glossy filled portion of a track. The negative right margin pushes the
+        liquid UNDER the orb thumb, so you never see the fill's end-cap sitting
+        next to the circle — the bar flows into and beneath the glass ball.
+    -->
+    <ControlTemplate x:Key="SliderFillButton" TargetType="RepeatButton">
+        <Grid VerticalAlignment="Center" Margin="0,0,-14,0">
+            <Border Height="7" CornerRadius="3.5,0,0,3.5" BorderThickness="1,1,0,1"
+                    BorderBrush="{StaticResource SliderFillBorderBrush}"
+                    Background="{StaticResource SliderFillBrush}" />
+            <!-- shine strip riding the top of the liquid -->
+            <Border Height="2.4" CornerRadius="1.2" Margin="2.5,1.6,1,0"
+                    VerticalAlignment="Top" Background="#8CFFFFFF" />
+        </Grid>
+    </ControlTemplate>
+
+    <ControlTemplate x:Key="SliderFillButtonSmall" TargetType="RepeatButton">
+        <Grid VerticalAlignment="Center" Margin="0,0,-11,0">
+            <Border Height="5" CornerRadius="2.5,0,0,2.5" BorderThickness="1,1,0,1"
+                    BorderBrush="{StaticResource SliderFillBorderBrush}"
+                    Background="{StaticResource SliderFillBrush}" />
+            <Border Height="1.7" CornerRadius="0.85" Margin="2.2,1.2,1,0"
+                    VerticalAlignment="Top" Background="#80FFFFFF" />
+        </Grid>
+    </ControlTemplate>
+
+    <!-- Invisible remainder of the track (right of the thumb) -->
+    <ControlTemplate x:Key="SliderGhostButton" TargetType="RepeatButton">
+        <Rectangle Fill="Transparent" Height="16" />
+    </ControlTemplate>
+
+    <!-- ============================================================= -->
+    <!--  Seek bar                                                      -->
+    <!-- ============================================================= -->
+    <Style x:Key="SeekSlider" TargetType="Slider">
+        <Setter Property="Height" Value="20" />
+        <Setter Property="Minimum" Value="0" />
+        <Setter Property="IsMoveToPointEnabled" Value="True" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Slider">
+                    <Grid VerticalAlignment="Center">
+                        <!-- inset watery groove -->
+                        <Border Height="7" CornerRadius="3.5" BorderThickness="1"
+                                BorderBrush="{StaticResource SliderGrooveBorderBrush}"
+                                Background="{StaticResource SliderGrooveBrush}" />
+                        <!-- inner top shadow line: deepens the carved-glass look -->
+                        <Border Height="1.6" CornerRadius="0.8" Margin="2.5,0,2.5,0"
+                                VerticalAlignment="Center" Background="#2276A0C4"
+                                RenderTransform="1 0 0 1 0 -2" />
+                        <Track x:Name="PART_Track">
+                            <Track.DecreaseRepeatButton>
+                                <RepeatButton Command="Slider.DecreaseLarge" Focusable="False"
+                                              Template="{StaticResource SliderFillButton}" />
+                            </Track.DecreaseRepeatButton>
+                            <Track.IncreaseRepeatButton>
+                                <RepeatButton Command="Slider.IncreaseLarge" Focusable="False"
+                                              Template="{StaticResource SliderGhostButton}" />
+                            </Track.IncreaseRepeatButton>
+                            <Track.Thumb>
+                                <Thumb Width="16" Height="16"
+                                       Template="{StaticResource GlassOrbThumb}" />
+                            </Track.Thumb>
+                        </Track>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <!-- No media loaded (Maximum is 0): show just the empty groove -->
+                        <Trigger Property="Maximum" Value="0">
+                            <Setter TargetName="PART_Track" Property="Visibility" Value="Hidden" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ============================================================= -->
+    <!--  Volume slider                                                 -->
+    <!-- ============================================================= -->
+    <Style x:Key="VolumeSlider" TargetType="Slider">
+        <Setter Property="Width" Value="78" />
+        <Setter Property="Minimum" Value="0" />
+        <Setter Property="Maximum" Value="1" />
+        <Setter Property="IsMoveToPointEnabled" Value="True" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Slider">
+                    <Grid VerticalAlignment="Center" Height="18">
+                        <Border Height="5" CornerRadius="2.5" BorderThickness="1"
+                                BorderBrush="{StaticResource SliderGrooveBorderBrush}"
+                                Background="{StaticResource SliderGrooveBrush}" />
+                        <Track x:Name="PART_Track">
+                            <Track.DecreaseRepeatButton>
+                                <RepeatButton Command="Slider.DecreaseLarge" Focusable="False"
+                                              Template="{StaticResource SliderFillButtonSmall}" />
+                            </Track.DecreaseRepeatButton>
+                            <Track.IncreaseRepeatButton>
+                                <RepeatButton Command="Slider.IncreaseLarge" Focusable="False"
+                                              Template="{StaticResource SliderGhostButton}" />
+                            </Track.IncreaseRepeatButton>
+                            <Track.Thumb>
+                                <Thumb Width="13" Height="13"
+                                       Template="{StaticResource GlassOrbThumbSmall}" />
+                            </Track.Thumb>
+                        </Track>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+</ResourceDictionary>
