@@ -16,6 +16,18 @@ public enum AppViewMode
     NowPlaying
 }
 
+/// <summary>Which scene the Now Playing view renders.</summary>
+public enum VisualizationMode
+{
+    AlbumArt,
+    Bars,
+    Scope,
+    OceanMist,
+    Alchemy,
+    Battery,
+    PurpleHaze
+}
+
 public class MainViewModel : ObservableObject
 {
     private readonly LibraryService _library = new();
@@ -64,6 +76,7 @@ public class MainViewModel : ObservableObject
     private bool _suppressSeek;
 
     private AppViewMode _viewMode = AppViewMode.Library;
+    private VisualizationMode _visualization = VisualizationMode.AlbumArt;
 
     public MainViewModel()
     {
@@ -77,6 +90,8 @@ public class MainViewModel : ObservableObject
         _isMuted = s.IsMuted;
         _isShuffle = s.IsShuffle;
         _isRepeat = s.IsRepeat;
+        if (Enum.TryParse<VisualizationMode>(s.Visualization, out var viz))
+            _visualization = viz;
 
         WirePlayback();
         InitCommands();
@@ -674,7 +689,7 @@ public class MainViewModel : ObservableObject
             {
                 OnPropertyChanged(nameof(IsNowPlaying));
                 OnPropertyChanged(nameof(IsLibraryMode));
-                OnPropertyChanged(nameof(IsVisualizerActive));
+                RaiseVisualizationChanged();
             }
         }
     }
@@ -682,8 +697,56 @@ public class MainViewModel : ObservableObject
     public bool IsNowPlaying => _viewMode == AppViewMode.NowPlaying;
     public bool IsLibraryMode => _viewMode == AppViewMode.Library;
 
-    /// <summary>The Now Playing visualizer animates only when visible and playing.</summary>
-    public bool IsVisualizerActive => IsNowPlaying && IsPlaying;
+    /// <summary>Which Now Playing scene is selected (right-click menu).</summary>
+    public VisualizationMode Visualization
+    {
+        get => _visualization;
+        set
+        {
+            if (SetProperty(ref _visualization, value))
+            {
+                Settings.Visualization = value.ToString();
+                RaiseVisualizationChanged();
+            }
+        }
+    }
+
+    public bool IsAlbumArtMode => _visualization == VisualizationMode.AlbumArt;
+    public bool IsBarsMode => _visualization == VisualizationMode.Bars;
+    public bool IsScopeMode => _visualization == VisualizationMode.Scope;
+    public bool IsOceanMistMode => _visualization == VisualizationMode.OceanMist;
+    public bool IsAlchemyMode => _visualization == VisualizationMode.Alchemy;
+    public bool IsBatteryMode => _visualization == VisualizationMode.Battery;
+    public bool IsPurpleHazeMode => _visualization == VisualizationMode.PurpleHaze;
+
+    /// <summary>True for every scene except Album art — the visualizers run on a black stage.</summary>
+    public bool IsVisualizationScene => _visualization != VisualizationMode.AlbumArt;
+
+    /// <summary>Visualizers animate only when their mode is selected, visible and playing.</summary>
+    public bool IsBarsActive => IsNowPlaying && IsPlaying && IsBarsMode;
+    public bool IsScopeActive => IsNowPlaying && IsPlaying && IsScopeMode;
+    public bool IsOceanMistActive => IsNowPlaying && IsPlaying && IsOceanMistMode;
+    public bool IsAlchemyActive => IsNowPlaying && IsPlaying && IsAlchemyMode;
+    public bool IsBatteryActive => IsNowPlaying && IsPlaying && IsBatteryMode;
+    public bool IsPurpleHazeActive => IsNowPlaying && IsPlaying && IsPurpleHazeMode;
+
+    private void RaiseVisualizationChanged()
+    {
+        OnPropertyChanged(nameof(IsAlbumArtMode));
+        OnPropertyChanged(nameof(IsBarsMode));
+        OnPropertyChanged(nameof(IsScopeMode));
+        OnPropertyChanged(nameof(IsOceanMistMode));
+        OnPropertyChanged(nameof(IsAlchemyMode));
+        OnPropertyChanged(nameof(IsBatteryMode));
+        OnPropertyChanged(nameof(IsPurpleHazeMode));
+        OnPropertyChanged(nameof(IsVisualizationScene));
+        OnPropertyChanged(nameof(IsBarsActive));
+        OnPropertyChanged(nameof(IsScopeActive));
+        OnPropertyChanged(nameof(IsOceanMistActive));
+        OnPropertyChanged(nameof(IsAlchemyActive));
+        OnPropertyChanged(nameof(IsBatteryActive));
+        OnPropertyChanged(nameof(IsPurpleHazeActive));
+    }
 
     public string StatusText
     {
@@ -718,15 +781,20 @@ public class MainViewModel : ObservableObject
     public RelayCommand AddFilesCommand { get; private set; } = null!;
     public RelayCommand RefreshDrivesCommand { get; private set; } = null!;
     public RelayCommand CreatePlaylistCommand { get; private set; } = null!;
+    public RelayCommand OpenStreamCommand { get; private set; } = null!;
     public RelayCommand AddToPlaylistCommand { get; private set; } = null!;
+
+    /// <summary>Raised when the view should prompt for a stream URL.</summary>
+    public event Func<string?>? RequestStreamUrl;
     public RelayCommand DeletePlaylistCommand { get; private set; } = null!;
     public RelayCommand RemoveFromPlaylistCommand { get; private set; } = null!;
     public RelayCommand BackCommand { get; private set; } = null!;
     public RelayCommand ForwardCommand { get; private set; } = null!;
     public RelayCommand CheckUpdatesCommand { get; private set; } = null!;
+    public RelayCommand SetVisualizationCommand { get; private set; } = null!;
 
     /// <summary>Raised when an update is found; the view decides how to surface it.</summary>
-    public event Action<string, string>? UpdateAvailable;
+    public event Action<UpdateResult>? UpdateAvailable;
 
     /// <summary>True when the content pane is showing a playlist (enables remove/delete menu items).</summary>
     public bool IsViewingPlaylist => SelectedNav?.View == LibraryView.PlaylistItem;
@@ -762,12 +830,22 @@ public class MainViewModel : ObservableObject
         AddFilesCommand = new RelayCommand(async () => await AddFilesAsync());
         RefreshDrivesCommand = new RelayCommand(RefreshDrives);
         CreatePlaylistCommand = new RelayCommand(_ => CreatePlaylist());
+        OpenStreamCommand = new RelayCommand(_ =>
+        {
+            var url = RequestStreamUrl?.Invoke();
+            if (!string.IsNullOrWhiteSpace(url)) OpenStream(url);
+        });
         AddToPlaylistCommand = new RelayCommand(p => AddSelectedToPlaylist(p as Playlist));
         DeletePlaylistCommand = new RelayCommand(p => DeletePlaylist(p as Playlist));
         RemoveFromPlaylistCommand = new RelayCommand(_ => RemoveSelectedFromPlaylist());
         BackCommand = new RelayCommand(GoBack, () => CanGoBack);
         ForwardCommand = new RelayCommand(GoForward, () => CanGoForward);
         CheckUpdatesCommand = new RelayCommand(async () => await CheckForUpdatesAsync(manual: true));
+        SetVisualizationCommand = new RelayCommand(p =>
+        {
+            if (p is string name && Enum.TryParse<VisualizationMode>(name, out var mode))
+                Visualization = mode;
+        });
     }
 
     /// <summary>The live settings object — the Settings dialog binds straight to it.</summary>
@@ -791,6 +869,9 @@ public class MainViewModel : ObservableObject
         _settings.Save();
     }
 
+    /// <summary>Releases the audio device; call when the app closes.</summary>
+    public void ShutdownPlayback() => _playback.Dispose();
+
     /// <summary>
     /// Queries GitHub for a newer release. Manual checks always report a result;
     /// the silent startup check only speaks up when an update actually exists.
@@ -804,7 +885,7 @@ public class MainViewModel : ObservableObject
         {
             case UpdateStatus.UpdateAvailable:
                 StatusText = $"Version {result.LatestVersion} is available";
-                UpdateAvailable?.Invoke(result.LatestVersion!, result.ReleaseUrl ?? UpdateService.ReleasesPageUrl);
+                UpdateAvailable?.Invoke(result);
                 break;
             case UpdateStatus.UpToDate when manual:
                 StatusText = $"You're up to date (v{UpdateService.CurrentVersion.ToString(3)})";
@@ -812,6 +893,32 @@ public class MainViewModel : ObservableObject
             case UpdateStatus.CheckFailed when manual:
                 StatusText = "Couldn't check for updates";
                 break;
+        }
+    }
+
+    /// <summary>
+    /// The auto-updater for installed copies: downloads the new Setup exe with
+    /// live progress in the status area, launches it silently and closes the
+    /// app so the installer can swap the files and relaunch us.
+    /// </summary>
+    public async Task InstallUpdateAsync(UpdateResult update)
+    {
+        try
+        {
+            StatusText = "Downloading update…";
+            var progress = new Progress<double>(p =>
+                StatusText = $"Downloading update… {p * 100:0}%");
+
+            string setupPath = await _updates.DownloadInstallerAsync(update, progress);
+
+            StatusText = "Installing update…";
+            PersistSettings();
+            UpdateService.LaunchInstaller(setupPath);
+            System.Windows.Application.Current.Shutdown();
+        }
+        catch
+        {
+            StatusText = "Update failed — try again from Organize › Check for updates";
         }
     }
 
@@ -878,6 +985,82 @@ public class MainViewModel : ObservableObject
         _playback.Open(track.Track);
         _playback.Play();
         OnPropertyChanged(nameof(IsPlaying));
+    }
+
+    /// <summary>Plays a track that isn't necessarily in the current list (its own one-item queue).</summary>
+    private void PlaySingle(TrackViewModel track)
+    {
+        _playQueue = new List<TrackViewModel> { track };
+        CurrentTrack = track;
+        _playback.Open(track.Track);
+        _playback.Play();
+        OnPropertyChanged(nameof(IsPlaying));
+    }
+
+    /// <summary>
+    /// Opens files handed to us on the command line or by a file association:
+    /// adds them to the library and starts playing the first playable one.
+    /// </summary>
+    public void OpenAndPlay(string[] paths)
+    {
+        TrackViewModel? toPlay = null;
+        int added = 0;
+
+        foreach (var path in paths)
+        {
+            if (string.IsNullOrWhiteSpace(path) || !File.Exists(path)) continue;
+
+            var kind = KindFor(path);
+            var existing = _allTracks.FirstOrDefault(t =>
+                string.Equals(t.Track.FilePath, path, StringComparison.OrdinalIgnoreCase));
+
+            TrackViewModel vm;
+            if (existing is not null)
+            {
+                vm = existing;
+            }
+            else
+            {
+                var track = LibraryService.ReadTrack(path, kind);
+                if (track is null) continue;
+                vm = new TrackViewModel(track);
+                _allTracks.Add(vm);
+                added++;
+            }
+
+            toPlay ??= kind == MediaKind.Picture ? null : vm;
+        }
+
+        if (added > 0)
+        {
+            _library.Save(_allTracks.Select(t => t.Track));
+            RefreshCurrentView();
+            OnPropertyChanged(nameof(ShowEmptyHint));
+        }
+
+        if (toPlay is not null)
+            PlaySingle(toPlay);
+    }
+
+    /// <summary>Opens an internet radio / stream URL and starts playing it.</summary>
+    public void OpenStream(string url, string? name = null)
+    {
+        if (string.IsNullOrWhiteSpace(url)) return;
+        url = url.Trim();
+        if (!url.Contains("://")) url = "http://" + url;
+
+        var track = new Track
+        {
+            FilePath = url,
+            Title = string.IsNullOrWhiteSpace(name) ? url : name!.Trim(),
+            Artist = "Internet stream",
+            Album = "Streaming",
+            Kind = MediaKind.Music,
+            IsStream = true
+        };
+
+        PlaySingle(new TrackViewModel(track));
+        StatusText = $"Streaming {track.Title}";
     }
 
     private void PlayNext()
@@ -1027,7 +1210,14 @@ public class MainViewModel : ObservableObject
         _playback.StateChanged += (_, _) =>
         {
             OnPropertyChanged(nameof(IsPlaying));
-            OnPropertyChanged(nameof(IsVisualizerActive));
+            RaiseVisualizationChanged();
+        };
+
+        _playback.MediaFailed += (_, _) =>
+        {
+            StatusText = "Can't play this file";
+            OnPropertyChanged(nameof(IsPlaying));
+            RaiseVisualizationChanged();
         };
 
         _playback.MediaEnded += (_, _) =>

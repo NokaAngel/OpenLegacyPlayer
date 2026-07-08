@@ -18,6 +18,9 @@ public class AppSettings
     public double WindowHeight { get; set; } = 720;
     public bool IsMaximized { get; set; }
 
+    // Now Playing
+    public string Visualization { get; set; } = "AlbumArt";
+
     // Updates
     public bool CheckUpdatesOnStartup { get; set; } = true;
 }

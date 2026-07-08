@@ -10,8 +10,12 @@ for Windows 10 and 11.
 ![OpenLegacy Player](docs/screenshot.png)
 
 <p align="center">
-  <img src="docs/nowplaying.png" width="49%" alt="Now Playing with visualizer" />
-  <img src="docs/playlist.png" width="49%" alt="Playlists" />
+  <img src="docs/alchemy.png" width="49%" alt="Alchemy visualization" />
+  <img src="docs/bars.png" width="49%" alt="Bars and Waves visualization" />
+</p>
+<p align="center">
+  <img src="docs/purplehaze.png" width="49%" alt="Battery: purple haze" />
+  <img src="docs/scope.png" width="49%" alt="Scope visualization" />
 </p>
 
 ---
@@ -36,9 +40,24 @@ Both are self-contained: **no .NET installation required.** Windows 10/11, 64-bi
 - Full **Frutiger Aero interface**: glass window chrome, gradient toolbars, the
   glossy blue play orb, floating glass bubbles, diagonal light streaks, and
   liquid-fill sliders with glass-ball thumbs.
-- A redesigned **Now Playing** view — deep-blue glass backdrop, glow halo behind
-  the cover art, a mirrored reflection beneath it, and a **WMP-style "Bars"
-  visualizer** with peak caps and water reflections that dances while music plays.
+- A redesigned **Now Playing** view — the Album art scene sits on a deep-blue
+  glass backdrop with a glow halo and mirrored reflection, while every
+  visualization runs on a **pure black stage**, just like the original.
+  **Right-click ▸ Visualizations** to switch:
+  - **Bars and Waves** — *Bars* (a real spectrum analyzer with peak caps, water
+    reflections and a live waveform ribbon), *Ocean Mist* (luminous fog waves
+    rolling in the dark), and *Scope* (a glowing oscilloscope trace with
+    afterglow).
+  - **Alchemy ▸ Random** — jagged neon comet ribbons with lens-flare heads.
+  - **Battery** — *sepiaswirl* (kaleidoscopic smoke with a breathing mandala and
+    a palette that drifts around the colour wheel) and *purple haze* (slow
+    violet nebula clouds).
+- **Truly audio-reactive** — playback runs through an FFT tap, so every scene
+  responds to the actual music: bars track the spectrum, ribbons kink with
+  their band's energy, fog banks swell with theirs, and bass drives the smoke.
+- **Aero glass menus** everywhere — the right-click menus and toolbar dropdowns
+  are all frosted glass with the classic blue hover, and the old shortcuts work:
+  `Ctrl+H` shuffle, `Ctrl+T` repeat, `Space` play/pause.
 - Custom chrome that still behaves like a real window: snapping, resizing,
   maximizing to the work area (your taskbar stays visible), and a red-glow
   close button straight out of 2007.
@@ -51,6 +70,13 @@ Both are self-contained: **no .NET installation required.** Windows 10/11, 64-bi
   grouped by folder — no freezing, even with tens of thousands of files.
 - **Playlists** — create playlists and add tracks with a right-click. Stored as
   standard **`.m3u`** files, so they work in any other player too.
+- **Internet radio** — click **Stream** on the toolbar and paste any MP3 radio
+  or media stream URL. It plays instantly, and the visualizers react to it just
+  like a local file.
+- **Opens your files** — double-click a song and it plays in OpenLegacy Player
+  (once you've set it as your default from *Settings ▸ Set as default music
+  player*). A second launch hands the file to the running window instead of
+  opening a new one.
 - **Views** — All music, Artist, Album, Genre, Videos and Pictures, with the
   classic group headers, blue title links and gold star ratings.
 
@@ -59,9 +85,13 @@ Both are self-contained: **no .NET installation required.** Windows 10/11, 64-bi
   shuffle/repeat, and window size all come back the way you left them.
 - **Settings** dialog (*Organize ▸ Settings…*) with quick access to your data
   folders and an update-check toggle.
-- Built-in **update checker** — the app quietly checks this repository's releases
-  on startup and lets you know when a new version is out. It never downloads
-  anything without you.
+- Built-in **automatic updater** — the app quietly checks this repository's
+  releases on startup. When one is found it shows a tidy **"Update available"
+  card with the full changelog** and lets you choose **Update now** or **Ask
+  later** — never forced. On the installed version, Update now **downloads the
+  new installer, updates in place and restarts the app** (with live progress in
+  the status bar); the portable version opens the download page. Nothing is ever
+  downloaded without your OK, and the startup check can be turned off in Settings.
 - Working **back / forward** navigation, live search, and a streaming scan
   progress bar in true WMP style.
 
@@ -74,7 +104,8 @@ Both are self-contained: **no .NET installation required.** Windows 10/11, 64-bi
 2. **Play** — double-click any track. Use the transport bar for shuffle, repeat,
    seek and volume.
 3. **Now Playing** — click the ⤢ button at the bottom-right (or the album
-   thumbnail) for the full-screen Aero scene with the visualizer.
+   thumbnail) for the full-screen Aero scene, then **right-click** to switch
+   between Album art, Bars and Waves, and Alchemy.
 4. **Playlists** — *Create playlist* on the toolbar, then right-click tracks ▸
    *Add to playlist*.
 
@@ -86,8 +117,8 @@ Delete that folder and the app starts completely fresh.
 
 ## 📌 Good to know
 
-- The Now Playing visualizer is **decorative** (like the classic skins) rather
-  than a true spectrum analyzer — a real one is on the roadmap.
+- Playback uses the system's Media Foundation codecs — mp3, m4a/aac, wma, wav
+  and flac all play out of the box on Windows 10/11.
 - The **Burn** tab and **Stream** button are cosmetic nods to the original for
   now.
 - Settings marked *(coming soon)* — color themes, mini player, crossfade,
@@ -99,7 +130,7 @@ Delete that folder and the app starts completely fresh.
 - Album / Artist tile views with cover art
 - Mini / compact player mode
 - Editable ratings and metadata
-- More visualizer styles, true audio-reactive rendering
+- More Alchemy and Battery presets
 - Video playback surface in Now Playing
 - Drag-and-drop playlist reordering
 

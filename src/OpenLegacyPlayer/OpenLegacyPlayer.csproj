@@ -9,12 +9,13 @@
     <RootNamespace>OpenLegacyPlayer</RootNamespace>
     <AssemblyName>OpenLegacyPlayer</AssemblyName>
     <ApplicationManifest>app.manifest</ApplicationManifest>
-    <Version>0.2.0</Version>
+    <Version>0.3.0</Version>
     <Product>OpenLegacy Player</Product>
     <Description>A Frutiger Aero era Windows Media Player Legacy recreation in WPF.</Description>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="NAudio" Version="2.2.1" />
     <PackageReference Include="TagLibSharp" Version="2.3.0" />
   </ItemGroup>
 

@@ -35,6 +35,30 @@ public partial class SettingsWindow : Window
     private static string DataDir => Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "OpenLegacyPlayer");
 
+    private void SetDefault_Click(object sender, RoutedEventArgs e)
+    {
+        // Deep-link to our entry in Windows "Default apps" when possible; the
+        // registeredApp* keys are only honoured on an installed (registered) copy.
+        string appName = "OpenLegacy Player";
+        string[] uris =
+        {
+            $"ms-settings:defaultapps?registeredAppMachine={appName}",
+            $"ms-settings:defaultapps?registeredAppUser={appName}",
+            "ms-settings:defaultapps"
+        };
+
+        foreach (var uri in uris)
+        {
+            try
+            {
+                System.Diagnostics.Process.Start(
+                    new System.Diagnostics.ProcessStartInfo(uri) { UseShellExecute = true });
+                return;
+            }
+            catch { /* try the next, more generic URI */ }
+        }
+    }
+
     private void OpenDataFolder_Click(object sender, RoutedEventArgs e) => OpenFolder(DataDir);
 
     private void OpenPlaylistsFolder_Click(object sender, RoutedEventArgs e)

@@ -172,6 +172,13 @@
         <GradientStop Color="#FFE3F3FD" Offset="1.0" />
     </LinearGradientBrush>
 
+    <!-- Menu popup surface: white glass fading to pale blue -->
+    <LinearGradientBrush x:Key="MenuPopupBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#FFFFFFFF" Offset="0" />
+        <GradientStop Color="#FFF6FAFD" Offset="0.55" />
+        <GradientStop Color="#FFEAF2F9" Offset="1" />
+    </LinearGradientBrush>
+
     <!-- Segoe MDL2 Assets glyph font -->
     <FontFamily x:Key="SymbolFont">Segoe MDL2 Assets</FontFamily>
 

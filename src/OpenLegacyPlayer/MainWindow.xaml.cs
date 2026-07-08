@@ -24,14 +24,24 @@ public partial class MainWindow : Window
         _vm.RequestPlaylistName += () =>
             Views.InputDialog.Prompt(this, "Create playlist", "Name your playlist:", "New Playlist");
 
-        // Offer the GitHub releases page when a newer version is found.
-        _vm.UpdateAvailable += (version, url) =>
+        // …and for a stream / internet radio URL.
+        _vm.RequestStreamUrl += () =>
+            Views.InputDialog.Prompt(this, "Open stream",
+                "Enter an internet radio or media stream URL:", "https://");
+
+        // A newer release exists. Show the changelog and let the user choose —
+        // never forced. Installed copies can update in place; portable copies
+        // get pointed at the download page.
+        _vm.UpdateAvailable += update =>
         {
-            var choice = MessageBox.Show(this,
-                $"OpenLegacy Player {version} is available.\n\nOpen the download page?",
-                "Update available", MessageBoxButton.YesNo, MessageBoxImage.Information);
-            if (choice == MessageBoxResult.Yes)
-                OpenUrl(url);
+            bool canAutoUpdate = Services.UpdateService.IsInstalledCopy && update.InstallerUrl is not null;
+            if (!Views.UpdateWindow.Ask(this, update, canAutoUpdate))
+                return; // "Ask later" — we'll mention it again next launch
+
+            if (canAutoUpdate)
+                _ = _vm.InstallUpdateAsync(update);
+            else
+                OpenUrl(update.ReleaseUrl ?? Services.UpdateService.ReleasesPageUrl);
         };
 
         // Restore last window size/state.
@@ -59,6 +69,7 @@ public partial class MainWindow : Window
             var bounds = max ? RestoreBounds : new Rect(Left, Top, Width, Height);
             _vm.UpdateWindowMetrics(bounds.Width, bounds.Height, max);
             _vm.PersistSettings();
+            _vm.ShutdownPlayback();
         };
 
         // Dev-only: render the window to a PNG then exit (used for visual checks).
@@ -117,6 +128,20 @@ public partial class MainWindow : Window
             : WindowState.Maximized;
 
     private void Close_Click(object sender, RoutedEventArgs e) => Close();
+
+    /// <summary>Opens (and starts playing) files passed on the command line or by file association.</summary>
+    public void OpenFiles(string[] paths) => _vm.OpenAndPlay(paths);
+
+    /// <summary>Restores and focuses the window when a second launch forwards files to us.</summary>
+    public void BringToFront()
+    {
+        if (WindowState == WindowState.Minimized)
+            WindowState = WindowState.Normal;
+        Activate();
+        Topmost = true;
+        Topmost = false;
+        Focus();
+    }
 
     private void Settings_Click(object sender, RoutedEventArgs e)
     {

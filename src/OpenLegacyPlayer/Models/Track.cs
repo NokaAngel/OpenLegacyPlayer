@@ -31,6 +31,10 @@ public class Track
 
     public MediaKind Kind { get; set; } = MediaKind.Music;
 
+    /// <summary>True when <see cref="FilePath"/> is a network stream (internet radio, etc.).</summary>
+    [JsonIgnore]
+    public bool IsStream { get; set; }
+
     /// <summary>Cached album art, stored separately so serialization stays light.</summary>
     [JsonIgnore]
     public byte[]? AlbumArt { get; set; }

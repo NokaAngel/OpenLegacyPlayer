@@ -303,6 +303,171 @@
     </Style>
 
     <!-- ============================================================= -->
+    <!--  Aero glass menus (context menus + the Organize dropdown)      -->
+    <!-- ============================================================= -->
+
+    <!-- The floating popup panel shared by every menu level -->
+    <ControlTemplate x:Key="AeroMenuPopupPanel" TargetType="ContentControl">
+        <Border Margin="4,2,6,8" CornerRadius="3" Padding="3"
+                Background="{StaticResource MenuPopupBrush}"
+                BorderBrush="{StaticResource ChromeBorderBrush}" BorderThickness="1"
+                SnapsToDevicePixels="True">
+            <Border.Effect>
+                <DropShadowEffect Color="#66000000" BlurRadius="8" ShadowDepth="2" Opacity="0.45" />
+            </Border.Effect>
+            <ContentPresenter />
+        </Border>
+    </ControlTemplate>
+
+    <!-- Menu separator: hairline indented past the icon column -->
+    <Style x:Key="{x:Static MenuItem.SeparatorStyleKey}" TargetType="Separator">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Separator">
+                    <Border Height="1" Margin="26,3,6,3" Background="{StaticResource HairlineBrush}" />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Item inside a dropdown (leaf) -->
+    <ControlTemplate x:Key="AeroSubmenuItem" TargetType="MenuItem">
+        <Border x:Name="bd" CornerRadius="3" Background="Transparent"
+                BorderThickness="1" BorderBrush="Transparent" SnapsToDevicePixels="True">
+            <Grid Margin="2,4">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="22" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="12" />
+                </Grid.ColumnDefinitions>
+                <TextBlock x:Name="check" Grid.Column="0" Text="&#xE915;"
+                           FontFamily="{StaticResource SymbolFont}" FontSize="8"
+                           Foreground="{StaticResource AccentLineBrush}"
+                           HorizontalAlignment="Center" VerticalAlignment="Center"
+                           Visibility="Hidden" />
+                <ContentPresenter Grid.Column="1" ContentSource="Header"
+                                  VerticalAlignment="Center" RecognizesAccessKey="True" />
+                <TextBlock Grid.Column="2" Text="{TemplateBinding InputGestureText}"
+                           Foreground="{StaticResource SubtleTextBrush}" FontSize="11"
+                           Margin="18,0,4,0" VerticalAlignment="Center" />
+            </Grid>
+        </Border>
+        <ControlTemplate.Triggers>
+            <Trigger Property="IsChecked" Value="True">
+                <Setter TargetName="check" Property="Visibility" Value="Visible" />
+            </Trigger>
+            <Trigger Property="IsHighlighted" Value="True">
+                <Setter TargetName="bd" Property="Background" Value="{StaticResource HoverBrush}" />
+                <Setter TargetName="bd" Property="BorderBrush" Value="{StaticResource GlassButtonBorderBrush}" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Foreground" Value="#FFA8B4C0" />
+            </Trigger>
+        </ControlTemplate.Triggers>
+    </ControlTemplate>
+
+    <!-- Item inside a dropdown that opens a further submenu -->
+    <ControlTemplate x:Key="AeroSubmenuHeader" TargetType="MenuItem">
+        <Border x:Name="bd" CornerRadius="3" Background="Transparent"
+                BorderThickness="1" BorderBrush="Transparent" SnapsToDevicePixels="True">
+            <Grid Margin="2,4">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="22" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="12" />
+                </Grid.ColumnDefinitions>
+                <ContentPresenter Grid.Column="1" ContentSource="Header"
+                                  VerticalAlignment="Center" RecognizesAccessKey="True" />
+                <TextBlock Grid.Column="3" Text="&#xE76C;"
+                           FontFamily="{StaticResource SymbolFont}" FontSize="9"
+                           Foreground="{StaticResource AccentLineBrush}"
+                           HorizontalAlignment="Left" VerticalAlignment="Center" />
+                <Popup x:Name="PART_Popup" Placement="Right" HorizontalOffset="-2" VerticalOffset="-6"
+                       IsOpen="{TemplateBinding IsSubmenuOpen}" AllowsTransparency="True"
+                       Focusable="False" PopupAnimation="Fade">
+                    <ContentControl Template="{StaticResource AeroMenuPopupPanel}">
+                        <ItemsPresenter KeyboardNavigation.DirectionalNavigation="Cycle" />
+                    </ContentControl>
+                </Popup>
+            </Grid>
+        </Border>
+        <ControlTemplate.Triggers>
+            <Trigger Property="IsHighlighted" Value="True">
+                <Setter TargetName="bd" Property="Background" Value="{StaticResource HoverBrush}" />
+                <Setter TargetName="bd" Property="BorderBrush" Value="{StaticResource GlassButtonBorderBrush}" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Foreground" Value="#FFA8B4C0" />
+            </Trigger>
+        </ControlTemplate.Triggers>
+    </ControlTemplate>
+
+    <!-- Top-level menu button (e.g. "Organize" on the toolbar) -->
+    <ControlTemplate x:Key="AeroTopLevelHeader" TargetType="MenuItem">
+        <Border x:Name="bd" CornerRadius="3" Background="Transparent"
+                BorderThickness="1" BorderBrush="Transparent"
+                Padding="{TemplateBinding Padding}" SnapsToDevicePixels="True">
+            <Grid>
+                <ContentPresenter ContentSource="Header" VerticalAlignment="Center"
+                                  RecognizesAccessKey="True" />
+                <Popup x:Name="PART_Popup" Placement="Bottom" VerticalOffset="1"
+                       IsOpen="{TemplateBinding IsSubmenuOpen}" AllowsTransparency="True"
+                       Focusable="False" PopupAnimation="Fade">
+                    <ContentControl Template="{StaticResource AeroMenuPopupPanel}">
+                        <ItemsPresenter KeyboardNavigation.DirectionalNavigation="Cycle" />
+                    </ContentControl>
+                </Popup>
+            </Grid>
+        </Border>
+        <ControlTemplate.Triggers>
+            <Trigger Property="IsHighlighted" Value="True">
+                <Setter TargetName="bd" Property="Background" Value="{StaticResource HoverBrush}" />
+                <Setter TargetName="bd" Property="BorderBrush" Value="{StaticResource GlassButtonBorderBrush}" />
+            </Trigger>
+            <Trigger Property="IsSubmenuOpen" Value="True">
+                <Setter TargetName="bd" Property="Background" Value="{StaticResource SelectionBrush}" />
+                <Setter TargetName="bd" Property="BorderBrush" Value="{StaticResource SelectionBorderBrush}" />
+            </Trigger>
+        </ControlTemplate.Triggers>
+    </ControlTemplate>
+
+    <!-- Role-aware MenuItem style; keyed so ItemContainerStyles can extend it -->
+    <Style x:Key="AeroMenuItem" TargetType="MenuItem">
+        <Setter Property="Foreground" Value="{StaticResource BodyTextBrush}" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="Template" Value="{StaticResource AeroSubmenuItem}" />
+        <Style.Triggers>
+            <Trigger Property="Role" Value="SubmenuHeader">
+                <Setter Property="Template" Value="{StaticResource AeroSubmenuHeader}" />
+            </Trigger>
+            <Trigger Property="Role" Value="TopLevelHeader">
+                <Setter Property="Template" Value="{StaticResource AeroTopLevelHeader}" />
+            </Trigger>
+            <Trigger Property="Role" Value="TopLevelItem">
+                <Setter Property="Template" Value="{StaticResource AeroTopLevelHeader}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style TargetType="MenuItem" BasedOn="{StaticResource AeroMenuItem}" />
+
+    <Style TargetType="ContextMenu">
+        <Setter Property="OverridesDefaultStyle" Value="True" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ContextMenu">
+                    <ContentControl Template="{StaticResource AeroMenuPopupPanel}">
+                        <ItemsPresenter KeyboardNavigation.DirectionalNavigation="Cycle" />
+                    </ContentControl>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ============================================================= -->
     <!--  Slim Aero scrollbar                                           -->
     <!-- ============================================================= -->
     <Style x:Key="ScrollThumb" TargetType="Thumb">

@@ -62,6 +62,15 @@
                           Content="Check for updates when the app starts"
                           Foreground="{StaticResource BodyTextBrush}" />
 
+                <TextBlock Text="Default apps" Style="{StaticResource SectionHeader}" />
+                <StackPanel Orientation="Horizontal" Margin="2,2">
+                    <Button Style="{StaticResource GlassAction}" Content="Set as default music player…"
+                            Click="SetDefault_Click" />
+                </StackPanel>
+                <TextBlock x:Name="DefaultHintText" Margin="2,6,0,0" FontSize="11" TextWrapping="Wrap"
+                           Foreground="{StaticResource SubtleTextBrush}"
+                           Text="Opens Windows Default apps, where you can pick OpenLegacy Player for your audio files. (Windows requires you to confirm the choice there.)" />
+
                 <TextBlock Text="Library" Style="{StaticResource SectionHeader}" />
                 <StackPanel Orientation="Horizontal" Margin="2,2">
                     <Button Style="{StaticResource GlassAction}" Content="Open library folder"
